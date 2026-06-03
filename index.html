@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Project - Estimasi Biaya Kegiatan</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 40px; background: #f0f4f8; color: #333; }
+        .container { background: white; padding: 30px; border-radius: 12px; max-width: 600px; margin: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1, h2 { color: #1f4e79; }
+        .identity-box { background: #e2e8f0; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9em; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; }
+        button { background: #1f4e79; color: white; padding: 12px; border: none; border-radius: 6px; width: 100%; cursor: pointer; font-size: 1em; font-weight: bold; }
+        button:hover { background: #163856; }
+        .result-box { margin-top: 20px; padding: 15px; background: #f8fafc; border-left: 5px solid #22c55e; display: none; }
+        pre { background: #1e293b; color: #f8fafc; padding: 12px; border-radius: 6px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Informasi Kegiatan Mahasiswa</h1>
+    
+    <div class="identity-box">
+        <strong>Identitas Praktikan:</strong><br>
+        Nama: [Isi Nama Anda]<br>
+        NIM: [Isi NIM Anda]<br>
+        Matakuliah: Komputasi Awan<br><br>
+        <strong>Layanan Azure yang Digunakan:</strong>
+        <ul>
+            <li>Azure Static Web Apps (Frontend Website)</li>
+            <li>Azure Functions (Backend API Estimasi Biaya)</li>
+        </ul>
+    </div>
+
+    <h2>Kalkulator Estimasi Biaya Konsumsi</h2>
+    <div class="form-group">
+        <label for="jumlah">Jumlah Peserta:</label>
+        <input type="number" id="jumlah" value="40" min="1">
+    </div>
+    <div class="form-group">
+        <label for="jenis">Jenis Konsumsi:</label>
+        <select id="jenis">
+            <option value="snack">Snack (Rp15.000)</option>
+            <option value="makan">Makan (Rp30.000)</option>
+            <option value="lengkap">Lengkap (Rp45.000)</option>
+        </select>
+    </div>
+    <button onclick="hitungBiaya()">Hitung Estimasi</button>
+
+    <div class="result-box" id="resultBox">
+        <h3>Hasil Estimasi (Response API):</h3>
+        <p><strong>Total Biaya:</strong> <span id="totalTxt">Rp0</span></p>
+        <p>Raw JSON Response:</p>
+        <pre><code id="jsonRaw"></code></pre>
+    </div>
+</div>
+
+<script>
+    async function hitungBiaya() {
+        const jumlah = document.getElementById('jumlah').value;
+        const jenis = document.getElementById('jenis').value;
+        
+        // GANTI URL DI BAWAH INI DENGAN URL AZURE FUNCTION ANDA
+        const apiUrl = `https://func-serverless-021-e4cnavd8d7afabbs.southeastasia-01.azurewebsites.net/api/HttpEstimasiBiaya?jumlah=${jumlah}&jenis=${jenis}`;
+
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) throw new Error('Gagal mengambil data dari API');
+            
+            const data = await response.json();
+            
+            // Tampilkan hasil ke UI
+            document.getElementById('totalTxt').innerText = 'Rp ' + data.total.toLocaleString('id-ID');
+            document.getElementById('jsonRaw').innerText = JSON.stringify(data, null, 2);
+            document.getElementById('resultBox').style.display = 'block';
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    }
+</script>
+
+</body>
+</html>
